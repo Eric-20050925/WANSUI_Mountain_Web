@@ -1,0 +1,24 @@
+/*自动给我生成了个基础样式变量与重置设置*/
+@import './base.css';
+
+body {
+  /*设置了全局背景和常用中文字体族，但是她们好像要求了些特殊的字体，先这样*/
+  margin: 0;
+  background-color: #040507;
+  color: #f0f3f5;
+  font-family:
+    'Segoe UI',
+    'Microsoft YaHei',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Noto Sans CJK SC',
+    sans-serif;
+  display: flex;
+  min-height: 100vh;
+}
+
+#app {
+  /*自适应布局*/
+  flex: 1;
+  min-height: 100vh;
+}
