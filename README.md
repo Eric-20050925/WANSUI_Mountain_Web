@@ -74,3 +74,8 @@ d:\wss
    - 逻辑里 `router.push('/about')`
 
 然后npm run dev就行
+
+
+2025/10/26 Huyume
+Exhibition是我写的占位用的第三页 后续可以直接拿这个ExhibitionPlaceholder.vue开发 路由已经挂载好了
+

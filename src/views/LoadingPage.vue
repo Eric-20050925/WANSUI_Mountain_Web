@@ -1,16 +1,28 @@
-//现在这个加载是直接找的以前写过的纯模拟加载，没接入任何进度逻辑，之后全写完再改这个吧，目前先用着
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const progress = ref(0)
+const router = useRouter()
+
 let timerId
+let redirectTimer
+let hasRedirected = false
+
 const advance = () => {
   progress.value = Math.min(100, progress.value + Math.floor(Math.random() * 3) + 1)
   if (progress.value === 100 && timerId) {
     clearInterval(timerId)
     timerId = undefined
+    if (!hasRedirected) {
+      hasRedirected = true
+      redirectTimer = setTimeout(() => {
+        router.push('/intro')
+      }, 450)
+    }
   }
 }
+
 onMounted(() => {
   timerId = setInterval(advance, 120)
 })
@@ -18,6 +30,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (timerId) {
     clearInterval(timerId)
+  }
+  if (redirectTimer) {
+    clearTimeout(redirectTimer)
   }
 })
 </script>
@@ -50,7 +65,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   overflow: hidden;
   color: #ffd89c;
-  background-image: url('/LoadingPage/LodingPageBackground.png');
+  background-image: url('/LoadingPage/LoadingBackground.png');
   background-size: cover;
   background-position: center;
 }
