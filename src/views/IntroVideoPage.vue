@@ -37,7 +37,7 @@ const handleSkip = () => {
 }
 
 const enterExhibition = () => {
-  router.push('/exhibition')
+  router.push('/beforeexhibition')
 }
 
 onMounted(() => {

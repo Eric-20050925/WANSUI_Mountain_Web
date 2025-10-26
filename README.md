@@ -79,3 +79,7 @@ d:\wss
 2025/10/26 Huyume
 Exhibition是我写的占位用的第三页 后续可以直接拿这个ExhibitionPlaceholder.vue开发 路由已经挂载好了
 
+2025/10/26 yixiaosu
+完成第三页设计
+添加BeforeExhibition作为第三页
+由于没有ElementPlus用于组件设计，使用豆包设计bgm静音按钮

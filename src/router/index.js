@@ -16,9 +16,14 @@ const routes = [
     component: () => import('../views/IntroVideoPage.vue')
   },
   {
+    path: '/beforeexhibition',
+    name: 'BoforeExhibition',
+    component: () => import('../views/BeforeExhibition.vue')
+  },
+  {
     path: '/exhibition',
     name: 'Exhibition',
-    component: () => import('../views/ExhibitionPlaceholder.vue')
+    component: () => import('../views/Exhibition.vue')
   }
 ]
 
