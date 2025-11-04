@@ -1,19 +1,44 @@
 ﻿<script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useGlobalAudio } from '../composables/useGlobalAudio'
 
 const router = useRouter()
 const videoRef = ref(null)
 const hasEnded = ref(false)
+
+const { isMuted, setMuted, toggleMuted } = useGlobalAudio()
+
 const VIDEO_SRC = '/IntroPage/intro-video.mp4'
 const FINAL_FRAME_SRC = '/IntroPage/final-frame.png'
+
+const ensurePlayback = async () => {
+  const el = videoRef.value
+  if (!el || hasEnded.value) {
+    return
+  }
+
+  try {
+    await el.play()
+  } catch (error) {
+    // If autoplay with sound fails, fall back to muted playback without persisting mute.
+    if (!isMuted.value) {
+      el.muted = true
+      try {
+        await el.play()
+      } catch (_) {
+        /* give up silently */
+      }
+    }
+  }
+}
 
 const finishPlayback = () => {
   if (hasEnded.value) {
     return
   }
-  hasEnded.value = true
 
+  hasEnded.value = true
   const el = videoRef.value
   if (el) {
     el.pause()
@@ -28,9 +53,9 @@ const handleSkip = () => {
   const el = videoRef.value
   if (el) {
     try {
-      el.currentTime = el.duration || el.currentTime
-    } catch (error) {
-
+      el.currentTime = Number.isFinite(el.duration) ? el.duration : el.currentTime
+    } catch (_) {
+      /* ignore seek failures */
     }
   }
   finishPlayback()
@@ -42,14 +67,24 @@ const enterExhibition = () => {
 
 onMounted(() => {
   const el = videoRef.value
-  if (el) {
+  if (!el) {
+    return
+  }
+  el.muted = isMuted.value
+  ensurePlayback()
+})
 
-    const playPromise = el.play()
-    if (playPromise?.catch) {
-      playPromise.catch(() => {
+watch(isMuted, (muted) => {
+  const el = videoRef.value
+  if (!el) {
+    return
+  }
+  el.muted = muted
 
-      })
-    }
+  if (!muted) {
+    ensurePlayback()
+  } else {
+    el.muted = true
   }
 })
 </script>
@@ -63,9 +98,73 @@ onMounted(() => {
         :src="VIDEO_SRC"
         playsinline
         autoplay
-        muted
+        :muted="isMuted"
         @ended="handleVideoEnded"
       />
+
+      <button
+        type="button"
+        class="audio-toggle"
+        :aria-label="isMuted ? 'Unmute audio' : 'Mute audio'"
+        @click="toggleMuted"
+      >
+        <svg
+          v-if="isMuted"
+          class="icon"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11 5L6 9H2V15H6L11 19V5Z"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M15 9L20 15"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M20 9L15 15"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <svg
+          v-else
+          class="icon"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11 5L6 9H2V15H6L11 19V5Z"
+            fill="none"
+            stroke="white"
+            stroke-width="2"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M15.54 8.46C16.477 9.397 17.001 10.669 17.001 11.995C17.001 13.321 16.477 14.592 15.54 15.53"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M19.07 4.93C20.945 6.805 22.002 9.348 22.002 11.995C22.002 14.642 20.945 17.185 19.07 19.06"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
 
       <button
         v-if="!hasEnded"
@@ -89,10 +188,9 @@ onMounted(() => {
         <button
           type="button"
           class="enter-button"
+          aria-label="Enter exhibition"
           @click="enterExhibition"
-        >
-
-        </button>
+        />
       </div>
     </div>
   </div>
@@ -123,6 +221,33 @@ onMounted(() => {
   display: block;
 }
 
+.audio-toggle {
+  position: absolute;
+  top: 24px;
+  left: 32px;
+  width: 42px;
+  height: 42px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  z-index: 4;
+}
+
+.audio-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.audio-toggle .icon {
+  width: 22px;
+  height: 22px;
+}
+
 .skip-button {
   position: absolute;
   top: 24px;
@@ -137,10 +262,11 @@ onMounted(() => {
   text-transform: uppercase;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
+  z-index: 3;
 }
 
 .skip-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.85);
 }
 
@@ -148,10 +274,11 @@ onMounted(() => {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-  background: transparent;
-  padding: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: clamp(80px, 14vh, 200px);
+  z-index: 2;
 }
 
 .final-frame-image {
@@ -160,68 +287,60 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 0;
+  z-index: -1;
 }
 
 .enter-button {
-  position: absolute;
-  left: 50%;
-  bottom: 12vh;
-  transform: translateX(-50%);
-  z-index: 1;
-
-  width: clamp(280px, 36vw, 480px);
-  height: clamp(90px, 11vh, 130px);
-
+  width: clamp(260px, 34vw, 420px);
+  height: clamp(84px, 10vh, 120px);
   background-image: url('/IntroPage/buttonbackground.png');
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
-
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   cursor: pointer;
-
-  font-size: 1.8rem;
-  font-weight: bold;
-  letter-spacing: 0.2em;
-  color: #4a1f05;
-  text-shadow: 0 2px 6px rgba(255, 255, 255, 0.6);
-
   box-shadow:
-    0 10px 30px rgba(223, 155, 54, 0.45),
-    inset 0 3px 8px rgba(255, 255, 255, 0.4);
+    0 10px 36px rgba(223, 155, 54, 0.48),
+    inset 0 3px 10px rgba(255, 255, 255, 0.45);
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .enter-button:hover {
-  transform: translateX(-50%) translateY(-4px);
+  transform: translateY(-4px);
   box-shadow:
-    0 14px 34px rgba(223, 155, 54, 0.65),
-    inset 0 4px 10px rgba(255, 255, 255, 0.55);
+    0 16px 42px rgba(223, 155, 54, 0.65),
+    inset 0 4px 12px rgba(255, 255, 255, 0.55);
 }
 
 @media (max-width: 768px) {
-  .enter-button {
-    bottom: 8vh;
-    width: clamp(220px, 55vw, 340px);
-    height: clamp(70px, 9vh, 100px);
-    font-size: 1.3rem;
-    letter-spacing: 0.16em;
+  .audio-toggle {
+    top: 16px;
+    left: 20px;
+    width: 38px;
+    height: 38px;
   }
-}
+
+  .audio-toggle .icon {
+    width: 20px;
+    height: 20px;
+  }
+
   .skip-button {
     top: 16px;
     right: 20px;
     padding: 6px 14px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     letter-spacing: 0.1em;
   }
 
-  .enter-button {
-    padding: 12px 30px;
-    font-size: 1rem;
-    letter-spacing: 0.16em;
+  .final-frame {
+    padding-bottom: clamp(60px, 18vh, 140px);
   }
 
+  .enter-button {
+    width: clamp(220px, 60vw, 340px);
+    height: clamp(70px, 9vh, 100px);
+  }
+}
 </style>
