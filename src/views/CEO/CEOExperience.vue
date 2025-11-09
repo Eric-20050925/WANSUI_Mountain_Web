@@ -5,7 +5,7 @@ import { useGlobalAudio } from '../../composables/useGlobalAudio'
 
 const BACKGROUND_IMAGES = [
   '/CEOExperience/pause-ceo-0.png',
-  '/CEOExperience/pause-ceo-1.png',
+  '/CEOExperience/pause-ceo-0.png',
 ]
 const VIDEO_SOURCES = [
   '/CEOExperience/video-1.mp4',
@@ -130,8 +130,8 @@ const goToPreviousBackground = () => {
   currentVideoIndex.value = currentVideoIndex.value - 1
 }
 
-const routerTo=(Name)=>{
-  router.push({ name: Name })
+const routerTo = (name) => {
+  router.push({ name })
 }
 
 const playNextVideo = () => {
@@ -157,6 +157,11 @@ const playNextVideo = () => {
   }
   shouldPauseOnLoad.value = false
   currentVideoIndex.value = (currentVideoIndex.value + 1) % VIDEO_SOURCES.length
+}
+
+// 返回导航页的函数
+const goToNavigation = () => {
+  router.push({ name: 'Exhibition' })
 }
 
 watch(currentVideoSrc, () => {
@@ -272,91 +277,101 @@ onBeforeUnmount(() => {
 
       <!-- 锦囊点击判定区 -->
       <button
-        v-if="!isinPocket.value"
+        v-if="currentVideoIndex == 0"
         type="button"
-        class="pocket-button"
-        @click="playNextVideo"       
+        class="back-button"
+        @click="playNextVideo"
+      >
+        <img
+          src="/CEOExperience/empty.png"
+          alt="返回主界面"
+          class="control-image"
+        >
+      </button>
+      
+      <!-- 右下角返回导航页按钮 -->
+      <button
+        v-if="currentVideoIndex > 0"
+        type="button"
+        class="nav-back-button"
+        @click="goToNavigation"
       >
         <img
           src="/CEOExperience/backmain.png"
-          alt="上一张背景"
+          alt="返回导航页"
           class="control-image"
         >
-        </img>
       </button>
 
-      <!-- 五个锦囊跳转按钮 -->
-      <div v-if="!isinPocket.value">
-        <!-- 产品研发理念按钮 -->
-        <button
-          v-if="currentVideoIndex.valueOf!=0"
-          type="button"
-          class="pocket-button1"
-          @click="touterTo('ProductRationale')"       
-        >
-          <img
-            src="/CEOExperience/pocket/button1.png"
-            alt="上一张背景"
-            class="control-image"
+      <!-- 五个锦囊跳转按钮，分为两排 -->
+      <div v-if="currentVideoIndex > 0" class="pocket-buttons-container">
+        <!-- 第一排：前三个按钮 -->
+        <div class="buttons-row">
+          <!-- 产品研发理念按钮 -->
+          <button
+            type="button"
+            class="pocket-button pocket-button1"
+            @click="routerTo('ProductRationale')"
           >
-          </img>
-        </button>
-        <!-- 市场运营思维按钮 -->
-        <button
-          v-if="currentVideoIndex.valueOf!=0"
-          type="button"
-          class="pocket-button2"
-          @click="routerTo('MarketThinking')"       
-        >
-          <img
-            src="/CEOExperience/pocket/button2.png"
-            alt="上一张背景"
-            class="control-image"
+            <img
+              src="/CEOExperience/pocket/button1.png"
+              alt="产品研发理念"
+              class="control-image"
+            >
+          </button>
+          <!-- 市场运营思维按钮 -->
+          <button
+            type="button"
+            class="pocket-button pocket-button2"
+            @click="routerTo('MarketThinking')"
           >
-          </img>
-        </button>
-        <!-- 避免同质化思维按钮 -->
-        <!-- <button
-          v-if="currentVideoIndex.valueOf!=0"
-          type="button"
-          class="pocket-button3"
-          @click="playNextVideo"       
-        >
-          <img
-            src="/CEOExperience/pocket/button3.png"
-            alt="上一张背景"
-            class="control-image"
+            <img
+              src="/CEOExperience/pocket/button2.png"
+              alt="市场运营思维"
+              class="control-image"
+            >
+          </button>
+          <!-- 避免同质化思维按钮 -->
+          <button
+            type="button"
+            class="pocket-button pocket-button3"
+            @click="routerTo('AvoidHomogenization')"
           >
-          </img>
-        </button> -->
-        <!-- 企业的社会价值按钮 -->
-        <!-- <button
-          v-if="currentVideoIndex.valueOf!=0"
-          type="button"
-          class="pocket-button4"
-          @click="playNextVideo"       
-        >
-          <img
-            src="/CEOExperience/pocket/button4.png"
-            alt="上一张背景"
-            class="control-image"
+            <img
+              src="/CEOExperience/pocket/button3.png"
+              alt="避免同质化思维"
+              class="control-image"
+            >
+          </button>
+        </div>
+        
+        <!-- 第二排：后两个按钮 -->
+        <div class="buttons-row buttons-row-second">
+          <!-- 企业的社会价值按钮 -->
+          <button
+            type="button"
+            class="pocket-button pocket-button4"
+            @click="routerTo('SocialValue')"
           >
-          </img>
-        </button> -->
-        <!-- 未来发展规划按钮 -->
-        <!-- <button
-          v-if="currentVideoIndex.valueOf!=0"
-          type="button"
-          class="pocket-button5"
-          @click="playNextVideo"       
-        >
-          <img
-            src="/CEOExperience/pocket/button5.png"
-            alt="上一张背景"
-            class="control-image"
+            <img
+              src="/CEOExperience/pocket/button4.png"
+              alt="企业的社会价值"
+              class="control-image"
+            >
+          </button>
+          <!-- 未来发展规划按钮 -->
+          <button
+            type="button"
+            class="pocket-button pocket-button5"
+            @click="routerTo('FuturePlanning')"
           >
-          </img>
-        </button> -->
+            <img
+              src="/CEOExperience/pocket/button5.png"
+              alt="未来发展规划"
+              class="control-image"
+            >
+          </button>
+        </div>
       </div>
 
     <video
@@ -434,50 +449,114 @@ onBeforeUnmount(() => {
 }
 
 .pocket-button {
-  position:absolute;
-  left:60%;
-  bottom: 35%;
-  padding: 0;
-  border: none;
-  /* background: none; */
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
-}
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+  }
 
-.pocket-button1 {
-  position:absolute;
-  left:35%;
-  bottom: 20%;
-  padding: 0;
-  border: none;
-  /* background: none; */
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  /* transform : scale(2.0); */
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
-}
+  .pocket-button:hover {
+    transform: translateY(-4px);
+  }
 
-.pocket-button1:hover {
-  transform: translateY(-4px);
-}
+  .pocket-buttons-container {
+    position: absolute;
+    left: 80%;
+    bottom: 10%;
+    transform: scale(1.5) translateX(-45%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 85%;
+    max-width: 1100px;
+  }
 
-.pocket-button2 {
-  position:absolute;
-  left:45%;
-  bottom: 20%;
-  padding: 0;
-  border: none;
-  /* background: none; */
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  /* transform : scale(2.0); */
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
-}
+  .buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: clamp(20px, 5vw, 40px);
+    margin-bottom: clamp(15px, 3vw, 25px);
+  }
 
-.pocket-button2:hover {
-  transform: translateY(-4px);
-}
+  .buttons-row-second {
+    margin-bottom: 0;
+    margin-top: -15px; /* 调整两排之间的距离 */
+    margin-left: clamp(30px, 8vw, 60px); /* 让第二排的两个按钮居中效果更好 */
+  }
+
+  .pocket-button1 {
+    transform: translateX(-10%);
+  }
+
+  .pocket-button2 {
+    transform: translateX(-5%);
+  }
+
+  .pocket-button3 {
+    transform: translateX(0);
+  }
+
+  .pocket-button4 {
+    transform: translateX(5%);
+  }
+
+  .pocket-button5 {
+    transform: translateX(10%);
+  }
+
+  /* 锦囊返回按钮的特定样式 */
+  .back-button {
+    position: absolute;
+    left: 62%;
+    bottom: 36%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
+  }
+
+  .back-button:hover {
+    transform: translateY(-4px);
+  }
+
+  .back-button .control-image {
+    width: clamp(100px, 20vw, 150px);
+    height: auto;
+  }
+
+  /* 右下角返回导航页按钮样式 */
+  .nav-back-button {
+    position: absolute;
+    right: clamp(20px, 5vw, 40px);
+    bottom: clamp(20px, 5vw, 40px);
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, scale 0.2s ease;
+    transform: scale(1.4);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    z-index: 5;
+  }
+
+  .nav-back-button:hover {
+    transform: scale(1.4) translateY(-3px) scale(1.05);
+  }
+
+  .nav-back-button .control-image {
+    width: clamp(60px, 12vw, 90px);
+    height: auto;
+  }
+
+  /* 根据pause-ceo-1.png参考的按钮大小调整 */
+  .pocket-button .control-image {
+    width: clamp(90px, 18vw, 150px);
+    height: auto;
+  }
 
 .audio-toggle {
   position: absolute;
