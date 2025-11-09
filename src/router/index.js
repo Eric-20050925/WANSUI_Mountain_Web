@@ -51,6 +51,51 @@ const routes = [
     component: () => import('../views/CEO/CEOExperience.vue')
   },
   {
+    path: '/product-rationale',
+    name: 'ProductRationale',
+    component: () => import('../views/CEO/MarketThinking/ProductRationale.vue')
+  },
+  {
+    path: '/market-thinking',
+    name: 'MarketThinking',
+    component: () => import('../views/CEO/MarketThinking.vue')
+  },
+  {
+    path: '/active-ip',
+    name: 'ActiveIP',
+    component: () => import('../views/CEO/MarketThinking/ActiveIP.vue')
+  },
+  {
+    path: '/bet-agreement',
+    name: 'BetAgreement',
+    component: () => import('../views/CEO/MarketThinking/BetAgreement.vue')
+  },
+  {
+    path: '/market-detail',
+    name: 'MarketDetail',
+    component: () => import('../views/CEO/MarketThinking/MarketDetail.vue')
+  },
+  {
+    path: '/market-detail',
+    name: 'MarketDetail',
+    component: () => import('../views/CEO/MarketThinking/MarketDetail.vue')
+  },
+  {
+    path: '/avoid-homogenization',
+    name: 'AvoidHomogenization',
+    component: () => import('../views/CEO/AvoidHomogenization.vue')
+  },
+  {
+    path: '/social-value',
+    name: 'SocialValue',
+    component: () => import('../views/CEO/SocialValue.vue')
+  },
+  {
+    path: '/future-plan',
+    name: 'FuturePlan',
+    component: () => import('../views/CEO/FuturePlan.vue')
+  },
+  {
     path: '/culture-experience',
     name: 'CultureExperience',
     component: () => import('../views/InExhibition/CultureExperience.vue')
