@@ -28,37 +28,37 @@ const routes = [
   {
     path: '/visitor-experience',
     name: 'VisitorExperience',
-    component: () => import('../views/VisitorExperience.vue')
+    component: () => import('../views/InExhibition/VisitorExperience.vue')
   },
   {
     path: '/visitor-journey',
     name: 'VisitorJourney',
-    component: () => import('../views/VisitorJourney.vue')
+    component: () => import('../views/InExhibition/VisitorJourney.vue')
   },
   {
     path: '/staff-experience',
     name: 'StaffExperience',
-    component: () => import('../views/StaffExperience.vue')
+    component: () => import('../views/InExhibition/StaffExperience.vue')
   },
   {
     path: '/staff-journey',
     name: 'StaffJourney',
-    component: () => import('../views/StaffJourney.vue')
+    component: () => import('../views/InExhibition/StaffJourney.vue')
   },
   {
     path: '/ceo-experience',
     name: 'CEOExperience',
-    component: () => import('../views/CEOExperience.vue')
+    component: () => import('../views/CEO/CEOExperience.vue')
   },
   {
     path: '/culture-experience',
     name: 'CultureExperience',
-    component: () => import('../views/CultureExperience.vue')
+    component: () => import('../views/InExhibition/CultureExperience.vue')
   },
   {
     path: '/media-experience',
     name: 'MediaExperience',
-    component: () => import('../views/MediaExperience.vue')
+    component: () => import('../views/InExhibition/MediaExperience.vue')
   }
 ]
 

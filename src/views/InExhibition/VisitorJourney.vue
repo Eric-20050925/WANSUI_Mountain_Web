@@ -1,23 +1,19 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useGlobalAudio } from '../composables/useGlobalAudio'
+import { useGlobalAudio } from '../../composables/useGlobalAudio'
 
 const BACKGROUND_IMAGES = [
-  '/StaffJourney/pause-staff-1.png',
-  '/StaffJourney/pause-staff-2.png',
-  '/StaffJourney/pause-staff-3.png',
-  '/StaffJourney/pause-staff-4.png',
-  '/StaffJourney/pause-staff-5.png',
-  '/StaffJourney/pause-staff-6.png'
+  '/VisitorJourney/pause-journey-1.png',
+  '/VisitorJourney/pause-journey-2.png',
+  '/VisitorJourney/pause-journey-3.png',
+  '/VisitorJourney/pause-journey-4.png'
 ]
 const VIDEO_SOURCES = [
-  '/StaffJourney/video-1.mp4',
-  '/StaffJourney/video-2.mp4',
-  '/StaffJourney/video-3.mp4',
-  '/StaffJourney/video-4.mp4',
-  '/StaffJourney/video-5.mp4',
-  '/StaffJourney/video-6.mp4'
+  '/VisitorJourney/video-1.mp4',
+  '/VisitorJourney/video-2.mp4',
+  '/VisitorJourney/video-3.mp4',
+  '/VisitorJourney/video-4.mp4'
 ]
 
 const { isMuted, toggleMuted } = useGlobalAudio()
@@ -42,8 +38,8 @@ const currentBackground = computed(() => {
   return BACKGROUND_IMAGES[BACKGROUND_IMAGES.length - 1]
 })
 
-const BGM = '/StaffJourney/bgm.MP3'
-const BGM_VOLUME = 0.28
+const BGM = '/VisitorJourney/bgm.mp3'
+const BGM_VOLUME = 0.4
 
 const syncVideoMuted = (muted) => {
   const el = videoRef.value
@@ -113,10 +109,12 @@ watch(isMuted, (muted) => {
 
 const handleVideoEnded = () => {
   hasEnded.value = true
+  shouldPauseOnLoad.value = true
 }
 
 const handleVideoPlay = () => {
   hasEnded.value = false
+  shouldPauseOnLoad.value = false
 }
 
 const goToPreviousBackground = () => {
@@ -266,10 +264,7 @@ onBeforeUnmount(() => {
       </svg>
     </button>
 
-    <div
-      class="overlay-controls"
-      :class="{ 'overlay-controls--last': isLastBackground }"
-    >
+    <div class="overlay-controls">
       <button
         v-if="hasEnded"
         type="button"
@@ -277,20 +272,20 @@ onBeforeUnmount(() => {
         @click="goToPreviousBackground"
       >
         <img
-          src="/StaffJourney/back.png"
+          src="/VisitorExperience/back.png"
           alt="上一张背景"
           class="control-image"
-      >
+        >
       </button>
       <button
         v-if="hasEnded"
         type="button"
-        class="control-button control-button--next"
+        class="control-button"
         @click="playNextVideo"
         :class="{ 'control-button--main': isLastBackground }"
       >
         <img
-          :src="isLastBackground ? '/StaffJourney/backmain.png' : '/StaffJourney/next.png'"
+          :src="isLastBackground ? '/VisitorExperience/backmain.png' : '/VisitorExperience/next.png'"
           :alt="isLastBackground ? '返回主页面' : '播放下一个视频'"
           class="control-image"
         >
@@ -335,25 +330,18 @@ onBeforeUnmount(() => {
 
 .overlay-controls {
   position: absolute;
-  right: clamp(24px, 7vw, 96px);
-  bottom: clamp(0px, 3vw, 72px);
+  left: 75.5%;
+  bottom: clamp(-65px, -20vw, -45px);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: clamp(12px, 3vw, 24px);
+  gap: clamp(28px, 6vw, 48px);
+  transform: translateX(-50%);
   z-index: 3;
 }
 
-.overlay-controls--last {
-  bottom: clamp(72px, 12vw, 156px);
-}
-
-.control-button--next {
-  transform: translateY(-clamp(6px, 2vw, 20px));
-}
-
 .control-button {
-    padding: 0;
+  padding: 0;
   border: none;
   background: none;
   cursor: pointer;
@@ -372,12 +360,11 @@ onBeforeUnmount(() => {
 }
 
 .control-button--main .control-image {
-  width: clamp(135px, 16vw, 210px);
+  width: clamp(90px, 11vw, 130px);
 }
 
 .control-button--main {
-  margin-top: 0;
-  transform: none;
+  margin-top: clamp(-32px, -8vw, -56px);
 }
 
 .audio-toggle {
@@ -425,6 +412,7 @@ onBeforeUnmount(() => {
 .visitor-video.is-hidden {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 @media (max-aspect-ratio: 3 / 4) {

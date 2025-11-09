@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useGlobalAudio } from '../composables/useGlobalAudio'
+import { useGlobalAudio } from '../../composables/useGlobalAudio'
 
 const BACKGROUND_IMAGES = [
   '/VisitorExperience/pause-visitor-1.png',

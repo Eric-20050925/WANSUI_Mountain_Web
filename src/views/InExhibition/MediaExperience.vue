@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useGlobalAudio } from '../composables/useGlobalAudio'
+import { useGlobalAudio } from '../../composables/useGlobalAudio'
 
 const { isMuted, toggleMuted } = useGlobalAudio()
 const router = useRouter()

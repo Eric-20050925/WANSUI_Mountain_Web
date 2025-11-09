@@ -385,7 +385,7 @@ watch(isMuted, (muted) => {
     <header class="page-header">
       <img
         src="/Exhibition/title.png"
-        alt="浜虹墿浠嬬粛"
+        alt="解码万岁山"
         class="title-image"
       >
     </header>
