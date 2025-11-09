@@ -21,13 +21,12 @@ const ensurePlayback = async () => {
   try {
     await el.play()
   } catch (error) {
-    // If autoplay with sound fails, fall back to muted playback without persisting mute.
     if (!isMuted.value) {
       el.muted = true
+      setMuted(true, { persist: false })
       try {
         await el.play()
       } catch (_) {
-        /* give up silently */
       }
     }
   }
@@ -55,7 +54,6 @@ const handleSkip = () => {
     try {
       el.currentTime = Number.isFinite(el.duration) ? el.duration : el.currentTime
     } catch (_) {
-      /* ignore seek failures */
     }
   }
   finishPlayback()

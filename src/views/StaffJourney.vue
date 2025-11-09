@@ -42,8 +42,8 @@ const currentBackground = computed(() => {
   return BACKGROUND_IMAGES[BACKGROUND_IMAGES.length - 1]
 })
 
-const BGM = '/StaffJourney/bgm.mp3'
-const BGM_VOLUME = 0.4
+const BGM = '/StaffJourney/bgm.MP3'
+const BGM_VOLUME = 0.28
 
 const syncVideoMuted = (muted) => {
   const el = videoRef.value
@@ -56,11 +56,9 @@ const syncVideoMuted = (muted) => {
       const maybePromise = el.play?.()
       if (maybePromise && typeof maybePromise.then === 'function') {
         maybePromise.catch(() => {
-          /* ignore play rejection */
         })
       }
     } catch (_) {
-      /* ignore autoplay failure */
     }
   }
 }
@@ -73,17 +71,14 @@ const ensureBgmPlayback = () => {
   try {
     el.volume = BGM_VOLUME
   } catch (_) {
-    /* ignore volume assignment failure */
   }
   try {
     const maybePromise = el.play?.()
     if (maybePromise && typeof maybePromise.then === 'function') {
       maybePromise.catch(() => {
-        /* ignore autoplay failure */
       })
     }
   } catch (_) {
-    /* ignore autoplay failure */
   }
 }
 
@@ -106,7 +101,6 @@ onMounted(() => {
     try {
       bgmEl.volume = BGM_VOLUME
     } catch (_) {
-      /* ignore volume assignment failure */
     }
     ensureBgmPlayback()
   }
@@ -149,12 +143,10 @@ const playNextVideo = () => {
       try {
         el.pause()
       } catch (_) {
-        /* ignore pause failure */
       }
       try {
         el.currentTime = 0
       } catch (_) {
-        /* ignore seek failure */
       }
     }
     return
@@ -174,7 +166,6 @@ watch(currentVideoSrc, () => {
     try {
       el.pause()
     } catch (_) {
-      /* ignore pause failure */
     }
     shouldPauseOnLoad.value = false
   } else {
@@ -191,12 +182,10 @@ onBeforeUnmount(() => {
   try {
     el.pause()
   } catch (_) {
-    /* ignore pause failure */
   }
   try {
     el.currentTime = 0
   } catch (_) {
-    /* ignore seek failure */
   }
 })
 </script>
@@ -277,7 +266,10 @@ onBeforeUnmount(() => {
       </svg>
     </button>
 
-    <div class="overlay-controls">
+    <div
+      class="overlay-controls"
+      :class="{ 'overlay-controls--last': isLastBackground }"
+    >
       <button
         v-if="hasEnded"
         type="button"
@@ -285,7 +277,7 @@ onBeforeUnmount(() => {
         @click="goToPreviousBackground"
       >
         <img
-          src="/VisitorExperience/back.png"
+          src="/StaffJourney/back.png"
           alt="上一张背景"
           class="control-image"
       >
@@ -293,12 +285,12 @@ onBeforeUnmount(() => {
       <button
         v-if="hasEnded"
         type="button"
-        class="control-button"
+        class="control-button control-button--next"
         @click="playNextVideo"
         :class="{ 'control-button--main': isLastBackground }"
       >
         <img
-          :src="isLastBackground ? '/VisitorExperience/backmain.png' : '/VisitorExperience/next.png'"
+          :src="isLastBackground ? '/StaffJourney/backmain.png' : '/StaffJourney/next.png'"
           :alt="isLastBackground ? '返回主页面' : '播放下一个视频'"
           class="control-image"
         >
@@ -343,24 +335,30 @@ onBeforeUnmount(() => {
 
 .overlay-controls {
   position: absolute;
-  right: clamp(16px, 4vw, 48px);
-  bottom: clamp(10px, 2vh, 30px);
-  display: grid;
-  place-items: center;
-  gap: 0;
-  transform: none;
+  right: clamp(24px, 7vw, 96px);
+  bottom: clamp(0px, 3vw, 72px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 3vw, 24px);
   z-index: 3;
 }
 
+.overlay-controls--last {
+  bottom: clamp(72px, 12vw, 156px);
+}
+
+.control-button--next {
+  transform: translateY(-clamp(6px, 2vw, 20px));
+}
+
 .control-button {
-  padding: 0;
+    padding: 0;
   border: none;
   background: none;
   cursor: pointer;
   transition: transform 0.2s ease;
   filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.35));
-  grid-area: 1 / 1;
-  z-index: 1;
 }
 
 .control-button:hover {
@@ -374,12 +372,12 @@ onBeforeUnmount(() => {
 }
 
 .control-button--main .control-image {
-  width: clamp(90px, 11vw, 130px);
+  width: clamp(135px, 16vw, 210px);
 }
 
 .control-button--main {
-  margin-top: clamp(-84px, -12vw, -52px);
-  z-index: 2;
+  margin-top: 0;
+  transform: none;
 }
 
 .audio-toggle {

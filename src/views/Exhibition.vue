@@ -141,10 +141,10 @@ const ensureBgmPlayback = async () => {
   } catch (error) {
     if (!isMuted.value) {
       bgmEl.muted = true
+      setMuted(true, { persist: false })
       try {
         await bgmEl.play()
       } catch (_) {
-        /* ignore autoplay failure */
       }
     }
   }
@@ -251,18 +251,35 @@ const navigateToDetail = (person, event) => {
 
   let target = routes.primary
 
-  if (
-    routes.secondary &&
-    typeof MouseEvent !== 'undefined' &&
-    event instanceof MouseEvent &&
-    event.currentTarget instanceof HTMLElement &&
-    event.currentTarget.classList.contains('detail-panel')
-  ) {
-    const rect = event.currentTarget.getBoundingClientRect()
-    if (rect.height > 0) {
-      const relativeY = event.clientY - rect.top
-      if (relativeY > rect.height / 2) {
-        target = routes.secondary
+  const panelEl =
+    event?.currentTarget instanceof HTMLElement ? event.currentTarget : null
+
+  const resolveClientY = (evt) => {
+    if (!evt) {
+      return null
+    }
+    if (typeof MouseEvent !== 'undefined' && evt instanceof MouseEvent) {
+      return evt.clientY
+    }
+    if (typeof PointerEvent !== 'undefined' && evt instanceof PointerEvent) {
+      return evt.clientY
+    }
+    if (typeof TouchEvent !== 'undefined' && evt instanceof TouchEvent) {
+      const touch = evt.touches?.[0] ?? evt.changedTouches?.[0]
+      return touch ? touch.clientY : null
+    }
+    return null
+  }
+
+  if (routes.secondary && panelEl) {
+    const clientY = resolveClientY(event)
+    if (typeof clientY === 'number') {
+      const rect = panelEl.getBoundingClientRect()
+      if (rect.height > 0) {
+        const relativeY = clientY - rect.top
+        if (relativeY > rect.height / 2) {
+          target = routes.secondary
+        }
       }
     }
   }
@@ -281,7 +298,6 @@ onMounted(() => {
       try {
         bgmEl.currentTime = bgmCurrentTime.value
       } catch (_) {
-        /* ignore seek failure */
       }
       setShouldResumeBgm(false)
     }

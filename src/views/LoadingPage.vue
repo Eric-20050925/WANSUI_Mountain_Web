@@ -69,7 +69,7 @@ onBeforeUnmount(() => {
   background-size: cover;
   background-position: center;
 }
-
+  
 .loading-content {
   position: relative;
   z-index: 1;

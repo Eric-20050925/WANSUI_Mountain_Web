@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGlobalAudio } from '../composables/useGlobalAudio'
 
@@ -21,6 +21,7 @@ const VIDEO_SOURCES = [
 const { isMuted, toggleMuted } = useGlobalAudio()
 const router = useRouter()
 const videoRef = ref(null)
+const bgmRef = ref(null)
 const audioLabel = computed(() => (isMuted.value ? 'Unmute audio' : 'Mute audio'))
 const hasEnded = ref(false)
 const currentVideoIndex = ref(0)
@@ -39,6 +40,9 @@ const currentBackground = computed(() => {
   return BACKGROUND_IMAGES[BACKGROUND_IMAGES.length - 1]
 })
 
+const BGM = '/VisitorExperience/bgm.mp3'
+const BGM_VOLUME = 0.4
+
 const syncVideoMuted = (muted) => {
   const el = videoRef.value
   if (!el) {
@@ -50,21 +54,59 @@ const syncVideoMuted = (muted) => {
       const maybePromise = el.play?.()
       if (maybePromise && typeof maybePromise.then === 'function') {
         maybePromise.catch(() => {
-          /* ignore play rejection */
         })
       }
     } catch (_) {
-      /* ignore autoplay failure */
     }
+  }
+}
+
+const ensureBgmPlayback = () => {
+  const el = bgmRef.value
+  if (!el) {
+    return
+  }
+  try {
+    el.volume = BGM_VOLUME
+  } catch (_) {
+  }
+  try {
+    const maybePromise = el.play?.()
+    if (maybePromise && typeof maybePromise.then === 'function') {
+      maybePromise.catch(() => {
+      })
+    }
+  } catch (_) {
+  }
+}
+
+const syncBgmMuted = (muted) => {
+  const el = bgmRef.value
+  if (!el) {
+    return
+  }
+  el.muted = muted
+  if (!muted) {
+    ensureBgmPlayback()
   }
 }
 
 onMounted(() => {
   syncVideoMuted(isMuted.value)
+  const bgmEl = bgmRef.value
+  if (bgmEl) {
+    bgmEl.muted = isMuted.value
+    try {
+      bgmEl.volume = BGM_VOLUME
+    } catch (_) {
+    }
+    ensureBgmPlayback()
+  }
 })
 
 watch(isMuted, (muted) => {
   syncVideoMuted(muted)
+  syncBgmMuted(muted)
 })
 
 const handleVideoEnded = () => {
@@ -76,13 +118,13 @@ const handleVideoPlay = () => {
 }
 
 const goToPreviousBackground = () => {
-  hasEnded.value = true
-  shouldPauseOnLoad.value = true
-
   if (currentVideoIndex.value === 0) {
+    router.push({ name: 'Exhibition' })
     return
   }
 
+  hasEnded.value = true
+  shouldPauseOnLoad.value = true
   currentVideoIndex.value = currentVideoIndex.value - 1
 }
 
@@ -99,12 +141,10 @@ const playNextVideo = () => {
       try {
         el.pause()
       } catch (_) {
-        /* ignore pause failure */
       }
       try {
         el.currentTime = 0
       } catch (_) {
-        /* ignore seek failure */
       }
     }
     return
@@ -124,12 +164,26 @@ watch(currentVideoSrc, () => {
     try {
       el.pause()
     } catch (_) {
-      /* ignore pause failure */
     }
     shouldPauseOnLoad.value = false
   } else {
     hasEnded.value = false
     syncVideoMuted(isMuted.value)
+  }
+})
+
+onBeforeUnmount(() => {
+  const el = bgmRef.value
+  if (!el) {
+    return
+  }
+  try {
+    el.pause()
+  } catch (_) {
+  }
+  try {
+    el.currentTime = 0
+  } catch (_) {
   }
 })
 </script>
@@ -139,6 +193,13 @@ watch(currentVideoSrc, () => {
     class="visitor-experience"
     :style="{ '--background-image': `url(${currentBackground})` }"
   >
+    <audio
+      ref="bgmRef"
+      :src="BGM"
+      loop
+      class="background-music"
+      :muted="isMuted"
+    />
     <button
       class="audio-toggle"
       type="button"
@@ -214,7 +275,7 @@ watch(currentVideoSrc, () => {
           src="/VisitorExperience/back.png"
           alt="上一张背景"
           class="control-image"
-        >
+      >
       </button>
       <button
         v-if="hasEnded"
@@ -302,6 +363,10 @@ watch(currentVideoSrc, () => {
   width: clamp(90px, 11vw, 130px);
 }
 
+.control-button--main {
+  margin-top: clamp(-32px, -8vw, -56px);
+}
+
 .audio-toggle {
   position: absolute;
   top: clamp(16px, 4vw, 32px);
@@ -327,6 +392,10 @@ watch(currentVideoSrc, () => {
 .audio-toggle .icon {
   width: 26px;
   height: 26px;
+}
+
+.background-music {
+  display: none;
 }
 
 .visitor-video {

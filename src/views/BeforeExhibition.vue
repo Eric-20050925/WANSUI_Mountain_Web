@@ -32,10 +32,10 @@ const ensureBgmPlayback = async () => {
   } catch (error) {
     if (!isMuted.value) {
       bgmEl.muted = true
+      setMuted(true, { persist: false })
       try {
         await bgmEl.play()
       } catch (_) {
-        /* ignore autoplay failure */
       }
     }
   }
@@ -75,7 +75,7 @@ const handleSkip = () => {
     try {
       el.currentTime = el.duration || el.currentTime
     } catch (_) {
-      /* ignore seek failure */
+
     }
   }
   finishPlayback()
@@ -89,7 +89,6 @@ onMounted(() => {
       try {
         bgmEl.currentTime = bgmCurrentTime.value
       } catch (_) {
-        /* ignore seek failure */
       }
       setShouldResumeBgm(false)
     }

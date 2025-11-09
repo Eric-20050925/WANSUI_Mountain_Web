@@ -6,12 +6,13 @@ let initialized = false
 
 const readFromStorage = () => {
   if (typeof window === 'undefined') {
-    return
+    return null
   }
   const stored = window.localStorage.getItem(STORAGE_KEY)
   if (stored !== null) {
     mutedRef.value = stored === 'true'
   }
+  return stored
 }
 
 const writeToStorage = (value) => {
@@ -23,13 +24,19 @@ const writeToStorage = (value) => {
 
 export function useGlobalAudio() {
   if (!initialized) {
-    readFromStorage()
+    const stored = readFromStorage()
+    if (stored === null) {
+      writeToStorage(mutedRef.value)
+    }
     initialized = true
   }
 
-  const setMuted = (value) => {
+  const setMuted = (value, options = {}) => {
+    const { persist = true } = options
     mutedRef.value = value
-    writeToStorage(value)
+    if (persist) {
+      writeToStorage(value)
+    }
   }
 
   const toggleMuted = () => {

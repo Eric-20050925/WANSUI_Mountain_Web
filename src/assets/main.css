@@ -1,6 +1,23 @@
 /*自动给我生成了个基础样式变量与重置设置*/
 @import './base.css';
 
+@font-face {
+  font-family: 'FZQianLXSJW';
+  src: url('/fonts/FZQianLXSJW.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'FZQianLXSJW', 'FZQingLongSongS', 'STKaiti', 'KaiTi', serif;
+}
+
 body {
   /*设置了全局背景和常用中文字体族，但是她们好像要求了些特殊的字体，先这样*/
   margin: 0;
